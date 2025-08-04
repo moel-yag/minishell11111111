@@ -32,6 +32,7 @@ SRC = ./execution/builtins/cd.c \
 ./main.c \
 ./main_utils.c \
 ./parsing/parsing.c \
+./parsing/help_parsing.c \
 ./tokens/test_tokenizer.c \
 ./tokens/tokenizer.c \
 ./utils/empty_line.c \

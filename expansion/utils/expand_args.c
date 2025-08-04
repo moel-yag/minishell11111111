@@ -29,4 +29,3 @@ char	*expand_arg(const char *arg, t_env *env, t_token *token)
     ctx.result[ctx.j] = '\0';
     return (ctx.result);
 }
-`

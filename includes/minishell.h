@@ -290,8 +290,14 @@ void					fill_arr(t_env **arr, t_env *temp, t_env *swap,
 							int count);
 void					check_and_free(char *value, char *name);
 void					print_util(int i, int count, t_env **arr);
-int ft_exit_withclear(int code);
 
+int 	ft_exit_withclear(int code);
+bool	ft_token_is_redirection(t_token_type type);
+t_ast	*create_ast_node(void);
+void	add_ast_node(t_ast **head, t_ast *new_node);
+bool	ft_token_is_redirection(t_token_type type);
+int		ft_lst_push(t_list **head, void *value);
+void	free_ast(t_ast *ast);
 
 // garbge collector 
 t_list ** gc_ptr();
