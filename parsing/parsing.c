@@ -58,10 +58,8 @@ static int	handle_pipe_token(t_ast **ast, t_ast **curr, t_token *current)
 
 t_ast	*parser(const char *input)
 {
-	t_token	*tokens;
-	t_token	*current;
-	t_ast	*ast;
-	t_ast	*curr;
+	t_token	(*tokens), (*current);
+	t_ast	(*ast), (*curr);
 	int		ret;
 
 	tokens = tokenize(input);
@@ -76,10 +74,7 @@ t_ast	*parser(const char *input)
 	curr = create_ast_node();
 	ast = curr;
 	if (!curr)
-	{
-		ft_putstr_fd("Error creating AST node.\n", 2);
-		return (NULL);
-	}
+		return (ft_putstr_fd("Error creating AST node.\n", 2), NULL);
 	while (current)
 	{
 		if (current->type == TOKEN_EOF)
