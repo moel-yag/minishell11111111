@@ -300,9 +300,9 @@ int						ft_lst_push(t_list **head, void *value);
 void					free_ast(t_ast *ast);
 
 // garbge collector 
-t_list					**gc_ptr();
+t_list					**gc_ptr(void);
 void					*ft_malloc(size_t size);
-void					ft_gc_clear();
+void					ft_gc_clear(void);
 void					ft_gc_add(void *ptr);
 
 #endif
