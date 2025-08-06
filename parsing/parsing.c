@@ -1,4 +1,5 @@
 #include "minishell.h"
+volatile sig_atomic_t *	ft_sigint_track();
 
 static int	handle_word_token(t_ast *curr, t_token *current)
 {
@@ -21,17 +22,25 @@ static int	handle_redirection_token(t_ast *curr, t_token *current)
 	{
 		redir = ft_malloc(sizeof(t_redir));
 		if (!redir)
-			return (0);
+			return (2);
 		redir->type = current->type;
 		redir->filename = ft_strdup(current->next->value);
 		ft_gc_add(redir->filename);
+
 		if (!redir->filename)
-			return (0);
+			return (2);
+		else if (redir->type == TOKEN_HEREDOC )
+		{
+			redir->value = handle_heredoc(redir->filename);
+			ft_gc_add(redir->value);
+			if (*ft_sigint_track() == 1)
+				return 130;
+		}
 		if (!ft_lst_push(&curr->redirections, redir))
-			return (0);
-		return (2);
+			return (2);
+		return (0);
 	}
-	return (0);
+	return (2);
 }
 
 static int	handle_pipe_token(t_ast **ast, t_ast **curr, t_token *current)
@@ -56,16 +65,51 @@ static int	handle_pipe_token(t_ast **ast, t_ast **curr, t_token *current)
 	return (1);
 }
 
+static int	parse_loop(t_token *current, t_ast *curr, t_token *tokens,
+			t_ast *ast)
+{
+	int (ret) = 0;
+	while (current)
+	{
+		if (current->type == TOKEN_EOF)
+			break ;
+		else if (current->type == TOKEN_WORD)
+		{
+			if (!handle_word_token(curr, current))
+				return (free_tokens(tokens), 2);
+		}
+		else if (ft_token_is_redirection(current->type))
+		{
+			ret = handle_redirection_token(curr, current);
+			if (ret != 0)
+				return (ft_putstr_fd("Syntax error: Unexpected token.\n", 2),free_tokens(tokens), ret);
+			else
+				current = current->next;
+		}
+		else if (current->type == TOKEN_PIPE)
+		{
+			if (!handle_pipe_token(&ast, &curr, current))
+				return (free_tokens(tokens), 2);
+		}
+		else
+			return (ft_putstr_fd("Syntax error: Unexpected token.\n", 2),
+				free_tokens(tokens), 2);
+		current = current->next;
+	}
+	return (0);
+}
+
 t_ast	*parser(const char *input)
 {
-	t_token	(*tokens), (*current);
-	t_ast	(*ast), (*curr);
 	int		ret;
 
-	tokens = tokenize(input);
-	current = tokens;
+	t_ast (*ast);
+	t_ast (*curr);
+	t_token (*tokens) = tokenize(input);
+	t_token (*current) = tokens;
 	if (!tokens)
 	{
+		g_data.exit_status = 2;
 		ft_putstr_fd("Error tokenizing input.\n", 2);
 		return (NULL);
 	}
@@ -75,36 +119,11 @@ t_ast	*parser(const char *input)
 	ast = curr;
 	if (!curr)
 		return (ft_putstr_fd("Error creating AST node.\n", 2), NULL);
-	while (current)
+	ret = parse_loop(current, curr, tokens, ast);
+	if (ret != 0)
 	{
-		if (current->type == TOKEN_EOF)
-			break ;
-		else if (current->type == TOKEN_WORD)
-		{
-			if (!handle_word_token(curr, current))
-				return (free_tokens(tokens), NULL);
-		}
-		else if (ft_token_is_redirection(current->type))
-		{
-			ret = handle_redirection_token(curr, current);
-			if (ret == 0)
-				return (free_tokens(tokens), NULL);
-			if (ret == 2)
-				current = current->next;
-		}
-		else if (current->type == TOKEN_PIPE)
-		{
-			if (!handle_pipe_token(&ast, &curr, current))
-				return (free_tokens(tokens), NULL);
-		}
-		else
-		{
-			ft_putstr_fd("Unexpected token type: ", 2);
-			ft_putnbr_fd(current->type, 2);
-			ft_putstr_fd("\n", 2);
-			return (free_tokens(tokens), NULL);
-		}
-		current = current->next;
+		g_data.exit_status = ret;
+		return (NULL);
 	}
 	free_tokens(tokens);
 	return (ast);

@@ -33,7 +33,7 @@ SRC = ./execution/builtins/cd.c \
 ./main_utils.c \
 ./parsing/parsing.c \
 ./parsing/help_parsing.c \
-./tokens/test_tokenizer.c \
+./parsing/help_parsing2.c \
 ./tokens/tokenizer.c \
 ./utils/empty_line.c \
 ./utils/env.c \
@@ -48,6 +48,9 @@ SRC = ./execution/builtins/cd.c \
 ./expansion/utils/init_context.c \
 ./expansion/utils/process_env_var.c \
 ./expansion/utils/quoted_str.c \
+./tokens/token_utils.c\
+./tokens/token_utils2.c\
+./tokens/token_utils3.c\
 
 
 # Object files

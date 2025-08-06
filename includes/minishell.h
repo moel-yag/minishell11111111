@@ -55,7 +55,7 @@ typedef struct s_command
 
 typedef enum e_token_type
 {
-	TOKEN_WORD,
+	TOKEN_WORD=0,
 	TOKEN_PIPE,
 	TOKEN_REDIRECT_IN,
 	TOKEN_REDIRECT_OUT,
@@ -105,8 +105,9 @@ typedef struct s_external_data
 
 typedef struct s_redir
 {
-	int					type;
+	t_token_type		type;
 	char				*filename;
+	char				*value;
 }						t_redir;
 
 typedef struct s_ast
@@ -143,12 +144,7 @@ void					add_command(t_command **head, t_command *new_cmd);
 void					shell_loop(t_command *cmd, char **env);
 
 /* Syntax validation */
-bool					check_syntax(const char *input);
-bool					file_syntax(const char *input);
-bool					validate_syntax(const char *input);
-bool					unclosed_quotes(const char *input);
 bool					is_blank_line(const char *s);
-bool					pipe_syntax(const char *input);
 
 /* Minishell-specific utils */
 char					*join_path(char *path, char *bin);
@@ -175,7 +171,7 @@ void					execute_echo(char **arguments, int status);
 void					handle_append_redirection(char *command, char **env);
 void					handle_output_redirection(char *command, char **env);
 void					handle_input_redirection(char *command, char **env);
-void					handle_heredoc(char *command, char **env);
+// void					handle_heredoc(char *command, char **env);
 
 void					free_split(char **split);
 int						get_len(char **s);
@@ -187,11 +183,8 @@ int						ft_split_size(char **split);
 int						get_len(char **s);
 
 /* Quote handling */
-char					*process_quotes(const char *input);
-bool					has_unclosed_quotes(const char *input);
 
 void					free_env_list(t_env *env);
-void					cleanup(void);
 
 bool					is_blank_line(const char *s);
 t_env					*env_from_array(char **env);
@@ -218,20 +211,18 @@ t_token					*tokenize(const char *input);
 void					free_ast(t_ast *ast);
 void					free_ast_list(t_ast *head);
 void					add_ast_node(t_ast **head, t_ast *new_node);
-char					*ft_token_gettype(t_token_type type);
 bool					ft_token_is_redirection(t_token_type type);
 void					print_ast(t_ast *ast);
 int						ft_lst_push(t_list **head, void *value);
 void					add_token(t_token **head, t_token *new_token);
 void					free_tokens(t_token *head);
 t_token					*tokenize_input(const char *input);
-bool					unclosed_quotes(const char *input);
 void					print_tokens(t_token *tokens);
 void					free_commands(t_ast *cmd);
 
 int						shell_execute(t_ast *ast, char **env, int status);
 
-int						ft_strcmp(char *s1, char *s2);
+// int						ft_strcmp(char *s1, char *s2);
 void					free_split(char **split);
 void					free_commands(t_ast *cmd);
 int						str_ichr(const char *str, char c);
@@ -299,6 +290,7 @@ bool					ft_token_is_redirection(t_token_type type);
 int						ft_lst_push(t_list **head, void *value);
 void					free_ast(t_ast *ast);
 
+char*						handle_heredoc(char *delimiter);
 // garbge collector 
 t_list					**gc_ptr(void);
 void					*ft_malloc(size_t size);

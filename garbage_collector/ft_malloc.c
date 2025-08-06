@@ -41,6 +41,8 @@ void	ft_gc_add(void *ptr)
 	t_list	**head;
 	t_list	*new_node;
 
+	if (!ptr)
+		return;
 	head = gc_ptr();
 	new_node = ft_lstnew(ptr);
 	if (!new_node)
